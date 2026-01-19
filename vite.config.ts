@@ -63,7 +63,7 @@ const fileName = `${packageName}${miniSuffix}.user.js`
 const metaFileName = `${packageName}${miniSuffix}.meta.js`
 
 const branchBaseUrl = (branch: string) =>
-  `https://raw.githubusercontent.com/magicdawn/Bilibili-Gate/refs/heads/${branch}/`
+  `https://raw.githubusercontent.com/owwkmidream/Bilibili-Gate/refs/heads/${branch}/`
 
 let downloadURL: string | undefined
 let updateURL: string | undefined
@@ -162,11 +162,11 @@ export default defineConfig(({ command, mode }) => ({
         'description': 'Bilibili 自定义首页',
         // 'description': 'Add app like recommend part to bilibili homepage',
         'version': scriptVersion,
-        'namespace': 'https://magicdawn.fun',
+        'namespace': 'https://github.com/owwkmidream',
         'icon': 'https://www.bilibili.com/favicon.ico',
-        'author': 'magicdawn',
-        'supportURL': 'https://github.com/magicdawn/Bilibili-Gate/issues',
-        'homepageURL': 'https://greasyfork.org/zh-CN/scripts/443530-bilibili-gate',
+        'author': 'owwkmidream',
+        'supportURL': 'https://github.com/owwkmidream/Bilibili-Gate/issues',
+        'homepageURL': 'https://github.com/owwkmidream/Bilibili-Gate',
         downloadURL,
         updateURL,
         'license': 'MIT',

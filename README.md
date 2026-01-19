@@ -6,7 +6,7 @@
 [![Greasy Fork Downloads](https://img.shields.io/greasyfork/dt/443530?style=flat-square)][gfurl]
 [![Greasy Fork Downloads](https://img.shields.io/greasyfork/dd/443530?style=flat-square)][gfurl]
 [![Greasy Fork Rating](https://img.shields.io/greasyfork/rating-count/443530?style=flat-square)][gfurl]
-[![Build Status](https://img.shields.io/github/actions/workflow/status/magicdawn/bilibili-gate/ci.yml?branch=main&style=flat-square&label=CI%20Build)](https://github.com/magicdawn/Bilibili-Gate/actions/workflows/ci.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/owwkmidream/bilibili-gate/ci.yml?branch=main&style=flat-square&label=CI%20Build)](https://github.com/owwkmidream/Bilibili-Gate/actions/workflows/ci.yml)
 
 [gfurl]: https://greasyfork.org/zh-CN/scripts/443530
 
@@ -14,7 +14,7 @@
 
 👉 [GreasyFork][gfurl]
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-👉 [开发版: 包含未发布的更改](https://github.com/magicdawn/Bilibili-Gate/raw/release-nightly/bilibili-gate.mini.user.js)
+👉 [开发版: 包含未发布的更改](https://github.com/owwkmidream/Bilibili-Gate/raw/release-nightly/bilibili-gate.mini.user.js)
 
 ## 功能
 
@@ -32,11 +32,11 @@
 
 ## 链接
 
-- 源代码 https://github.com/magicdawn/Bilibili-Gate 如果对你有用,请在 GitHub 点个 Star :)
+- 源代码 https://github.com/owwkmidream/Bilibili-Gate 如果对你有用,请在 GitHub 点个 Star :)
 - 从 GitHub 安装
-  - [Release](https://github.com/magicdawn/Bilibili-Gate/raw/release/bilibili-gate.user.js) (GreasyFork 版本自动同步源)
-  - [Release 最小化版本](https://github.com/magicdawn/Bilibili-Gate/raw/release/bilibili-gate.mini.user.js)
-  - [CI build](https://github.com/magicdawn/Bilibili-Gate/raw/release-nightly/bilibili-gate.mini.user.js)
+  - [Release](https://github.com/owwkmidream/Bilibili-Gate/raw/release/bilibili-gate.user.js) (GreasyFork 版本自动同步源)
+  - [Release 最小化版本](https://github.com/owwkmidream/Bilibili-Gate/raw/release/bilibili-gate.mini.user.js)
+  - [CI build](https://github.com/owwkmidream/Bilibili-Gate/raw/release-nightly/bilibili-gate.mini.user.js)
 
 ## 声明
 
@@ -273,7 +273,7 @@ _\* 截图均为不带 access_key 匿名获取, 不代表作者喜好_
 ## 开发 or 使用源代码构建最新版本
 
 ```sh
-git clone git@github.com:magicdawn/Bilibili-Gate.git
+git clone git@github.com:owwkmidream/Bilibili-Gate.git
 corepack enable # this project use corepack
 pnpm install
 pnpm build # build 完会自动使用 Chrome 打开安装地址
@@ -287,79 +287,6 @@ pnpm build # build 完会自动使用 Chrome 打开安装地址
 ## 支持
 
 - 如果对你有用, 请在 GitHub 点个 Star :)
-- 如果你喜欢这个项目, 可以 「[爱发电](https://afdian.com/a/magicdawn)」 支持一下
-
-![afdian-magicdawn_w375](https://raw.githubusercontent.com/magicdawn/magicdawn/master/images/afdian-magicdawn_w375_v2.jpg)
-
-### 赞助者
-
-感谢这些来自爱发电的赞助者：
-
-<!-- AFDIAN-ACTION:START -->
-
-<a href="https://afdian.com/u/d47d73e83ce911ed8bb652540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-blue.png?imageView2/1/w/120/h/120" width="40" height="40" alt="XYR_KTP" title="XYR_KTP"/>
-</a>
-<a href="https://afdian.com/u/12ee531a7a6611f09bd452540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_12ee5" title="爱发电用户_12ee5"/>
-</a>
-<a href="https://afdian.com/u/19ee38a0244011f09eef5254001e7c00">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_19ee3" title="爱发电用户_19ee3"/>
-</a>
-<a href="https://afdian.com/u/0df3ebccae1b11ee922352540025c377">
-  <img src="https://pic1.afdiancdn.com/user/0df3ebccae1b11ee922352540025c377/avatar/79326c2a4621158f572ea96118c5a2a4_w960_h960_s69.jpeg?imageView2/1/w/120/h/120" width="40" height="40" alt="冫水_块" title="冫水_块"/>
-</a>
-<a href="https://afdian.com/u/0abebc0a557d11ec9e8052540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-blue.png?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_ngR9" title="爱发电用户_ngR9"/>
-</a>
-<a href="https://afdian.com/u/7f117ec42b4411eda3e852540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_7f117" title="爱发电用户_7f117"/>
-</a>
-<a href="https://afdian.com/u/8f4c3df8963211ecb3de52540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-yellow.png?imageView2/1/w/120/h/120" width="40" height="40" alt="小培lovely" title="小培lovely"/>
-</a>
-<a href="https://afdian.com/u/adde092c531411eeb1b252540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/w/120/h/120" width="40" height="40" alt="璃幻梦" title="璃幻梦"/>
-</a>
-<a href="https://afdian.com/u/30dc989c9f6411efa78152540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-orange.png?imageView2/1/w/120/h/120" width="40" height="40" alt="HaBoom" title="HaBoom"/>
-</a>
-<a href="https://afdian.com/u/41803a229ed611ed9d9952540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-yellow.png?imageView2/1/w/120/h/120" width="40" height="40" alt="非法昵称银狼" title="非法昵称银狼"/>
-</a>
-<a href="https://afdian.com/u/e4ba6388815711efb91152540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-blue.png?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_PnHy" title="爱发电用户_PnHy"/>
-</a>
-<a href="https://afdian.com/u/50e374f26f8b11ef857252540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_50e37" title="爱发电用户_50e37"/>
-</a>
-<a href="https://afdian.com/u/4e1781c85d6611ef830f52540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-yellow.png?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_Gq7D" title="爱发电用户_Gq7D"/>
-</a>
-<a href="https://afdian.com/u/46feb6722e6811ef999f52540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_46feb" title="爱发电用户_46feb"/>
-</a>
-<a href="https://afdian.com/u/203aa308254811ef8aba52540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_203aa" title="爱发电用户_203aa"/>
-</a>
-<a href="https://afdian.com/u/194d3f34910411ee9a5a5254001e7c00">
-  <img src="https://pic1.afdiancdn.com/user/user_upload_osl/5b4d4e90c6dfe4b6a78b65d48fb9a2ef_w132_h132_s0.jpeg?imageView2/1/w/120/h/120" width="40" height="40" alt="xfgy1234" title="xfgy1234"/>
-</a>
-<a href="https://afdian.com/u/17cf949a203d11ef9be652540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_17cf9" title="爱发电用户_17cf9"/>
-</a>
-<a href="https://afdian.com/u/21b921fa200c11ef91a052540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_21b92" title="爱发电用户_21b92"/>
-</a>
-<a href="https://afdian.com/u/fde6772e19c011ef819352540025c377">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/w/120/h/120" width="40" height="40" alt="hhxc" title="hhxc"/>
-</a>
-<a href="https://afdian.com/u/2bb8b5ce11db11ef85bd5254001e7c00">
-  <img src="https://pic1.afdiancdn.com/default/avatar/avatar-purple.png?imageView2/1/?imageView2/1/w/120/h/120" width="40" height="40" alt="爱发电用户_2bb8b" title="爱发电用户_2bb8b"/>
-</a>
-<!-- 注意: 尽量将标签前靠,否则经测试可能被 GitHub 解析为代码块 -->
-
-<!-- AFDIAN-ACTION:END -->
 
 ## 更新日志
 
