@@ -66,12 +66,14 @@ export enum DynamicFeedVideoType {
   All = 'all',
   UploadOnly = 'upload-only',
   DynamicOnly = 'dynamic-only',
+  UgcSeasonOnly = 'ugc-season-only',
 }
 
 export enum DynamicFeedBadgeText {
   Upload = '投稿视频',
   Dynamic = '动态视频',
   ChargeOnly = '充电专属',
+  UgcSeason = '合集',
   // 其他: 抢先看
 }
 
@@ -79,6 +81,7 @@ export const DynamicFeedVideoTypeLabel: Record<DynamicFeedVideoType, string> = {
   [DynamicFeedVideoType.All]: '全部',
   [DynamicFeedVideoType.UploadOnly]: '仅投稿视频',
   [DynamicFeedVideoType.DynamicOnly]: '仅动态视频',
+  [DynamicFeedVideoType.UgcSeasonOnly]: '仅合集更新',
 }
 
 export enum DynamicFeedVideoMinDuration {

@@ -18,7 +18,12 @@ export const recItemUniqer = (item: RecItemTypeOrSeparator) =>
     : lookinto<string | number>(item, {
         [EApiType.AppRecommend]: (item) => item.param,
         [EApiType.PcRecommend]: (item) => item.bvid,
-        [EApiType.DynamicFeed]: (item) => item.modules.module_dynamic.major.archive.bvid,
+        [EApiType.DynamicFeed]: (item) => {
+          const major = item.modules.module_dynamic.major
+          if (major.archive) return major.archive.bvid
+          if (major.ugc_season) return major.ugc_season.bvid
+          return item.id_str
+        },
         [EApiType.Watchlater]: (item) => item.bvid,
         [EApiType.Fav]: (item) => item.bvid,
         [EApiType.PopularGeneral]: (item) => item.bvid,

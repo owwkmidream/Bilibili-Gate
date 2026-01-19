@@ -301,13 +301,36 @@ function apiPcAdapter(item: PcRecItemExtend): IVideoCardData {
 
 export type { DynamicFeedBadge }
 function apiDynamicAdapter(item: DynamicFeedItemExtend): IVideoCardData {
-  const v = item.modules.module_dynamic.major.archive
+  const major = item.modules.module_dynamic.major
   const author = item.modules.module_author
+
+  // 合集更新类型: DYNAMIC_TYPE_UGC_SEASON
+  const isUgcSeason = item.type === 'DYNAMIC_TYPE_UGC_SEASON' && major.ugc_season
+  const v = isUgcSeason ? major.ugc_season! : major.archive!
+
+  // ugc_season 和 archive 都有 bvid 字段
+  const aid = typeof v.aid === 'number' ? v.aid.toString() : v.aid
+  const bvid = (v as any).bvid
+
+  // 合集类型的作者名需要从 pub_action 中提取
+  // 格式如 "xxx更新了合集"，提取 "xxx"
+  let authorName = author.name
+  // 合集名在 module_author.name 中
+  const ugcSeasonName = isUgcSeason ? author.name : undefined
+  if (isUgcSeason && author.pub_action) {
+    const match = author.pub_action.match(/^(.+?)更新了合集$/)
+    if (match) {
+      authorName = match[1]
+    }
+  }
+
+  // 合集类型显示"合集 · 合集名"
+  const ugcSeasonRecommendReason = isUgcSeason && ugcSeasonName ? `合集 · ${ugcSeasonName}` : undefined
 
   return {
     // video
-    avid: v.aid,
-    bvid: v.bvid,
+    avid: aid,
+    bvid,
     // cid: v.
     goto: 'av',
     href: `/video/${v.bvid}/`,
@@ -317,9 +340,13 @@ function apiDynamicAdapter(item: DynamicFeedItemExtend): IVideoCardData {
     duration: parseDuration(v.duration_text) || 0,
     durationStr: v.duration_text,
 
-    // 普通视频显示 recommendReason, 其他显示 badge
-    recommendReason: v.badge.text === DynamicFeedBadgeText.Upload ? v.badge.text : undefined,
-    dynBadge: v.badge,
+    // 普通视频显示 recommendReason, 合集类型显示"合集 · 合集名"
+    recommendReason: isUgcSeason
+      ? ugcSeasonRecommendReason
+      : v.badge.text === DynamicFeedBadgeText.Upload
+        ? v.badge.text
+        : undefined,
+    dynBadge: v.badge as DynamicFeedBadge,
 
     // stat
     statItems: defineStatItems([
@@ -330,7 +357,7 @@ function apiDynamicAdapter(item: DynamicFeedItemExtend): IVideoCardData {
     danmaku: parseCount(v.stat.danmaku),
 
     // author
-    authorName: author.name,
+    authorName,
     authorFace: author.face,
     authorMid: author.mid.toString(),
   }

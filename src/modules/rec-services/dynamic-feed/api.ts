@@ -17,7 +17,7 @@ export async function fetchVideoDynamicFeeds({
 }) {
   const params: Record<string, number | string> = {
     'timezone_offset': '-480',
-    'type': 'video',
+    'type': 'all',
     'platform': 'web',
     'features': 'itemOpusStyle',
     'web_location': '0.0',
@@ -52,7 +52,8 @@ export async function fetchVideoDynamicFeeds({
 
   const data = json.data
   if (data?.items?.length) {
-    data.items = data.items.filter((x) => x.type === 'DYNAMIC_TYPE_AV') // 处理不了别的类型
+    // 过滤出视频类型: 普通视频(DYNAMIC_TYPE_AV) 和 合集更新(DYNAMIC_TYPE_UGC_SEASON)
+    data.items = data.items.filter((x) => x.type === 'DYNAMIC_TYPE_AV' || x.type === 'DYNAMIC_TYPE_UGC_SEASON')
   }
 
   return data

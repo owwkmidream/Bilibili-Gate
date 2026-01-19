@@ -328,7 +328,8 @@ export enum RichTextNodeType {
 }
 
 export interface Major {
-  archive: Archive
+  archive?: Archive
+  ugc_season?: UgcSeason
   type: MajorType
 }
 
@@ -360,6 +361,26 @@ export interface Stat {
 
 export enum MajorType {
   MajorTypeArchive = 'MAJOR_TYPE_ARCHIVE',
+  MajorTypeUgcSeason = 'MAJOR_TYPE_UGC_SEASON',
+}
+
+// UGC Season (合集) 类型
+export interface UgcSeason {
+  aid: number
+  bvid: string
+  badge: Badge
+  cover: string
+  desc: string
+  disable_preview: number
+  duration_text: string
+  jump_url: string
+  stat: Stat
+  title: string
+  type: number
+  // 合集特有字段
+  season_id?: number
+  section_id?: number
+  ep_id?: number
 }
 
 export interface Topic {
@@ -415,4 +436,5 @@ export interface Like {
 
 export enum ItemType {
   DynamicTypeAV = 'DYNAMIC_TYPE_AV',
+  DynamicTypeUgcSeason = 'DYNAMIC_TYPE_UGC_SEASON',
 }

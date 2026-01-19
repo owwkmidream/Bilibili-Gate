@@ -3,6 +3,7 @@ import pmap from 'promise.map'
 import { snapshot } from 'valtio'
 import { baseDebug } from '$common'
 import { EApiType } from '$define/index.shared'
+import { ItemType } from '$define/pc-dynamic-feed'
 import { getFollowGroupContent } from '$modules/bilibili/me/follow-group'
 import { settings } from '$modules/settings'
 import { parseAdvancedFilter } from '$utility/local-filter'
@@ -361,12 +362,20 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
         return this.groupMids.has(mid)
       })
 
-      // by 动态视频|投稿视频
+      // by 动态视频|投稿视频|合集更新
       .filter((x) => {
         // all
         if (this.dynamicFeedVideoType === DynamicFeedVideoType.All) return true
-        // type only
-        const currentLabel = x.modules.module_dynamic.major.archive.badge.text as string
+
+        // 仅合集更新
+        if (this.dynamicFeedVideoType === DynamicFeedVideoType.UgcSeasonOnly) {
+          return x.type === ItemType.DynamicTypeUgcSeason
+        }
+
+        // type only - 仅对普通视频进行过滤
+        const archive = x.modules.module_dynamic.major.archive
+        if (!archive) return true
+        const currentLabel = archive.badge.text as string
         if (this.dynamicFeedVideoType === DynamicFeedVideoType.DynamicOnly) {
           return currentLabel === DynamicFeedBadgeText.Dynamic
         }
@@ -387,7 +396,10 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
       // by 最短时长
       .filter((x) => {
         if (this.filterMinDuration === DynamicFeedVideoMinDuration.All) return true
-        const v = x.modules.module_dynamic.major.archive
+        const major = x.modules.module_dynamic.major
+        // 支持普通视频和合集更新
+        const v = major.ugc_season || major.archive
+        if (!v) return true
         const duration = parseDuration(v.duration_text)
         return duration >= this.filterMinDurationValue
       })
@@ -395,7 +407,8 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
       // by 关键字过滤
       .filter((x) => {
         if (!this.filterText) return true
-        const title = x?.modules?.module_dynamic?.major?.archive?.title || ''
+        const major = x.modules?.module_dynamic?.major
+        const title = major?.archive?.title || major?.ugc_season?.title || ''
         return filterByFilterText({
           filterText: this.filterText,
           title,

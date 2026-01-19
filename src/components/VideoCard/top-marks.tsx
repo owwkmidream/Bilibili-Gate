@@ -23,7 +23,8 @@ export function SomeBadge({ children, className }: { children?: ReactNode; class
 
 export function shouldShowDynamicFeedBadge(item: RecItemType) {
   if (item.api !== EApiType.DynamicFeed) return false
-  const badge = item.modules?.module_dynamic?.major?.archive?.badge
+  const major = item.modules?.module_dynamic?.major
+  const badge = major?.archive?.badge || major?.ugc_season?.badge
   if (!badge || !badge.text) return false
   if (badge.text === DynamicFeedBadgeText.Upload) return false
   return true
@@ -32,8 +33,10 @@ export function shouldShowDynamicFeedBadge(item: RecItemType) {
 export function DynamicFeedBadgeDisplay({ item }: { item: RecItemType }) {
   if (!shouldShowDynamicFeedBadge(item)) return null
   if (item.api !== EApiType.DynamicFeed) return null
-  const badge = item.modules?.module_dynamic?.major?.archive?.badge
-  const hasIcon = !!badge.icon_url
+  const major = item.modules?.module_dynamic?.major
+  const badge = major?.archive?.badge || major?.ugc_season?.badge
+  if (!badge) return null
+  const hasIcon = !!(badge as any).icon_url
   return (
     <SomeBadge
       className={clsx(
@@ -41,7 +44,7 @@ export function DynamicFeedBadgeDisplay({ item }: { item: RecItemType }) {
         hasIcon ? 'pl-4px pr-6px' : 'px-4px', // 有图标左边更显空旷
       )}
     >
-      {hasIcon && <Picture src={`${badge.icon_url}@!web-dynamic`} className='h-16px w-16px' />}
+      {hasIcon && <Picture src={`${(badge as any).icon_url}@!web-dynamic`} className='h-16px w-16px' />}
       {badge.text}
     </SomeBadge>
   )
