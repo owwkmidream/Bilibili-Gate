@@ -1,6 +1,6 @@
 import { useMemoizedFn } from 'ahooks'
 import clsx from 'clsx'
-import { assert } from 'es-toolkit'
+import { assert, delay } from 'es-toolkit'
 import { useMemo, useState } from 'react'
 import {
   handleModifyFavItemToFolder,
@@ -11,13 +11,22 @@ import { getMultiSelectedItems } from '$components/RecGrid/rec-grid-state'
 import { ETab } from '$components/RecHeader/tab-enum'
 import { isFav, isLiked, isWatchlater, type RecItemType } from '$define'
 import { antMessage, antModal, defineAntMenus } from '$modules/antd'
-import { IconForDelete, IconForEdit, IconForFav, IconForFaved, IconForOpenExternalLink } from '$modules/icon'
+import {
+  IconAnimatedChecked,
+  IconForDelete,
+  IconForEdit,
+  IconForFav,
+  IconForFaved,
+  IconForLoading,
+  IconForOpenExternalLink,
+} from '$modules/icon'
 import { multiSelectStore } from '$modules/multi-select/store'
 import { defaultFavFolderTitle, UserFavApi } from '$modules/rec-services/fav/api'
 import { formatFavCollectionUrl, formatFavFolderUrl } from '$modules/rec-services/fav/fav-url'
 import { clearFavFolderAllItemsCache } from '$modules/rec-services/fav/service/fav-folder'
 import { FavQueryKey, favStore } from '$modules/rec-services/fav/store'
 import toast from '$utility/toast'
+import { VideoCardActionButton } from '../child-components/VideoCardActions'
 import { clsContextMenuIcon } from '../context-menus'
 import { getLinkTarget } from './useOpenRelated'
 import type { RecSharedEmitter } from '$components/Recommends/rec.shared'
@@ -261,4 +270,80 @@ export function getFavTabMenus({
 
   // unexpected
   return []
+}
+
+/**
+ * 收藏夹视频卡片的移除按钮 hook
+ * 类似于稀后再看的移除按钮，点击后直接移除收藏（不二次确认）
+ * 动画流程：删除图标 -> 转圈 -> 打钩动画 -> 卡片消失
+ */
+export function useFavRemoveButton({
+  item,
+  cardData,
+  onRemoveCurrent,
+  actionButtonVisible,
+}: {
+  item: RecItemType
+  cardData: IVideoCardData
+  onRemoveCurrent: ((item: RecItemType, data: IVideoCardData, silent?: boolean) => void | Promise<void>) | undefined
+  actionButtonVisible: boolean
+}) {
+  const [loading, setLoading] = useState(false)
+  const [removed, setRemoved] = useState(false)
+
+  const hasFavRemoveEntry = useMemo(() => {
+    // 只在收藏夹视频上显示
+    return isFav(item) && item.from === 'fav-folder'
+  }, [item])
+
+  const onRemove = useMemoizedFn(async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+
+    if (loading || removed) return
+    if (!isFav(item) || item.from !== 'fav-folder') return
+
+    setLoading(true)
+    const resource = `${item.id}:${item.type}`
+    const success = await UserFavApi.removeFavs(item.folder.id, resource)
+
+    if (!success) {
+      setLoading(false)
+      return
+    }
+
+    clearFavFolderAllItemsCache(item.folder.id)
+
+    // 先关闭 loading，然后显示打钩动画
+    setLoading(false)
+    setRemoved(true)
+
+    // 等待动画完成后移除卡片 (IconAnimatedChecked 动画约 200ms)
+    await delay(250)
+    onRemoveCurrent?.(item, cardData)
+  })
+
+  const icon = (() => {
+    if (loading) {
+      return <IconForLoading className='size-16px' />
+    }
+    if (removed) {
+      return <IconAnimatedChecked size={18} useAnimation />
+    }
+    return <IconForDelete className='size-16px' />
+  })()
+
+  const tooltip = removed ? '已移除收藏' : '移除收藏'
+
+  const favRemoveButtonEl = hasFavRemoveEntry && (
+    <VideoCardActionButton
+      visible={actionButtonVisible}
+      inlinePosition='left'
+      icon={icon}
+      tooltip={tooltip}
+      onClick={onRemove}
+    />
+  )
+
+  return { favRemoveButtonEl, hasFavRemoveEntry }
 }

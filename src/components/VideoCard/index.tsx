@@ -78,7 +78,7 @@ import {
   VolMark,
 } from './top-marks'
 import { useDislikeRelated } from './use/useDislikeRelated'
-import { useInitFavContext } from './use/useFavRelated'
+import { useFavRemoveButton, useInitFavContext } from './use/useFavRelated'
 import { useMultiSelectRelated } from './use/useMultiSelect'
 import { getRecItemDimension, useLinkTarget, useOpenRelated } from './use/useOpenRelated'
 import { usePreviewRelated } from './use/usePreviewRelated'
@@ -389,6 +389,16 @@ const VideoCardInner = memo(function VideoCardInner({
    */
   const favContext = useInitFavContext(item, avid)
 
+  /**
+   * 收藏夹移除按钮
+   */
+  const { favRemoveButtonEl } = useFavRemoveButton({
+    item,
+    cardData,
+    onRemoveCurrent,
+    actionButtonVisible,
+  })
+
   // 打开视频卡片
   const {
     onOpenWithMode,
@@ -495,6 +505,9 @@ const VideoCardInner = memo(function VideoCardInner({
     <>
       {/* 多选 */}
       {multiSelecting && multiSelectEl}
+
+      {/* 收藏夹: 移除按钮 */}
+      {favRemoveButtonEl}
 
       {/* 我不想看 */}
       {dislikeButtonEl}
