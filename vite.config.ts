@@ -158,7 +158,7 @@ export default defineConfig(({ command, mode }) => ({
     monkey({
       entry: './src/index.ts',
       userscript: {
-        'name': 'Bilibili-Gate',
+        'name': 'Bilibili-Gate revamped',
         'description': 'Bilibili 自定义首页',
         // 'description': 'Add app like recommend part to bilibili homepage',
         'version': scriptVersion,
