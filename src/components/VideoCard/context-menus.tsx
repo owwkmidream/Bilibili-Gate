@@ -465,6 +465,7 @@ export function useContextMenus(options: UseContextMenuOptions): AntMenuItem[] {
       multiSelecting,
       multiSelectingAppendix,
       onRemoveCurrent,
+      onMoveToFirst,
       recSharedEmitter,
     })
 

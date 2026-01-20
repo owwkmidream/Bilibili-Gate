@@ -13,6 +13,7 @@ import { isFav, isLiked, isWatchlater, type RecItemType } from '$define'
 import { antMessage, antModal, defineAntMenus } from '$modules/antd'
 import {
   IconAnimatedChecked,
+  IconForAsc,
   IconForDelete,
   IconForEdit,
   IconForFav,
@@ -127,6 +128,7 @@ export function getFavTabMenus({
   multiSelecting,
   multiSelectingAppendix,
   onRemoveCurrent,
+  onMoveToFirst,
   recSharedEmitter,
 }: {
   ctx: FavContext
@@ -136,6 +138,7 @@ export function getFavTabMenus({
   multiSelecting: boolean | undefined
   multiSelectingAppendix: string
   onRemoveCurrent: ((item: RecItemType, data: IVideoCardData, silent?: boolean) => void | Promise<void>) | undefined
+  onMoveToFirst: ((item: RecItemType, data: IVideoCardData) => void | Promise<void>) | undefined
   recSharedEmitter: RecSharedEmitter
 }) {
   if (!isFav(item)) return []
@@ -243,6 +246,26 @@ export function getFavTabMenus({
 
           clearFavFolderAllItemsCache(item.folder.id)
           onRemoveCurrent?.(item, cardData)
+        },
+      },
+      {
+        test: tab === ETab.Fav,
+        key: 'fav-move-to-first',
+        label: '移到最前',
+        icon: <IconForAsc className={clsContextMenuIcon} />,
+        async onClick() {
+          // 先从收藏夹删除，再重新添加，这样视频会变成最新收藏的（排在最前）
+          const resource = `${item.id}:${item.type}`
+          const removeSuccess = await UserFavApi.removeFavs(item.folder.id, resource)
+          if (!removeSuccess) return
+
+          const addSuccess = await UserFavApi.addFav(cardData.avid!, item.folder.id)
+          if (!addSuccess) return
+
+          // 清除缓存并在本地UI同步移动到最前
+          clearFavFolderAllItemsCache(item.folder.id)
+          antMessage.success('已移到最前')
+          onMoveToFirst?.(item, cardData)
         },
       },
       ...batchMenus,
