@@ -3,7 +3,6 @@ import pmap from 'promise.map'
 import { snapshot } from 'valtio'
 import { baseDebug } from '$common'
 import { EApiType } from '$define/index.shared'
-import { ItemType } from '$define/pc-dynamic-feed'
 import { getFollowGroupContent } from '$modules/bilibili/me/follow-group'
 import { settings } from '$modules/settings'
 import { parseAdvancedFilter } from '$utility/local-filter'
@@ -12,6 +11,7 @@ import { BaseTabService, QueueStrategy } from '../_base'
 import { LiveRecService } from '../live'
 import { ELiveStatus } from '../live/live-enum'
 import { fetchVideoDynamicFeeds } from './api'
+import { isDynamicAv } from './api/enums'
 import { hasLocalDynamicFeedCache, localDynamicFeedCache, performIncrementalUpdateIfNeed } from './cache'
 import { FollowGroupMergeTimelineService } from './group/merge-timeline-service'
 import {
@@ -67,6 +67,7 @@ export function getDynamicFeedServiceConfig(usingDfStore: DynamicFeedStore = dfS
      * from settings
      */
     showLiveInDynamicFeed: settings.dynamicFeed.showLive,
+    videoOnly: settings.dynamicFeed.videoOnly,
 
     whenViewAllEnableHideSomeContents: settings.dynamicFeed.whenViewAll.enableHideSomeContents,
     whenViewAllHideIds: new Set(settings.dynamicFeed.whenViewAll.hideIds),
@@ -209,7 +210,10 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
       const mids = await getFollowGroupContent(this.groupId)
       this.groupMids = new Set(mids)
       if (this.shouldEnableMergeTimeline(mids.length)) {
-        this.groupMergeTimelineService = new FollowGroupMergeTimelineService(mids.map((x) => x.toString()))
+        this.groupMergeTimelineService = new FollowGroupMergeTimelineService(
+          mids.map((x) => x.toString()),
+          this.config.videoOnly,
+        )
       }
     } finally {
       this.groupMidsLoaded = true
@@ -319,6 +323,7 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
     else {
       // 未登录会直接 throw err
       const data = await fetchVideoDynamicFeeds({
+        videoOnly: this.config.videoOnly,
         abortSignal,
         page: this.page + 1, // ++this.page, starts from 1, 实测 page 没啥用, 分页基于 offset
         offset: this.offset,
@@ -362,20 +367,13 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
         return this.groupMids.has(mid)
       })
 
-      // by 动态视频|投稿视频|合集更新
+      // by 动态视频|投稿视频
       .filter((x) => {
         // all
         if (this.dynamicFeedVideoType === DynamicFeedVideoType.All) return true
-
-        // 仅合集更新
-        if (this.dynamicFeedVideoType === DynamicFeedVideoType.UgcSeasonOnly) {
-          return x.type === ItemType.DynamicTypeUgcSeason
-        }
-
-        // type only - 仅对普通视频进行过滤
-        const archive = x.modules.module_dynamic.major.archive
-        if (!archive) return true
-        const currentLabel = archive.badge.text as string
+        // type only
+        if (!isDynamicAv(x)) return false
+        const currentLabel = x.modules.module_dynamic?.major?.archive?.badge.text
         if (this.dynamicFeedVideoType === DynamicFeedVideoType.DynamicOnly) {
           return currentLabel === DynamicFeedBadgeText.Dynamic
         }
@@ -396,10 +394,8 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
       // by 最短时长
       .filter((x) => {
         if (this.filterMinDuration === DynamicFeedVideoMinDuration.All) return true
-        const major = x.modules.module_dynamic.major
-        // 支持普通视频和合集更新
-        const v = major.ugc_season || major.archive
-        if (!v) return true
+        const v = x.modules.module_dynamic.major?.archive
+        if (!v) return false
         const duration = parseDuration(v.duration_text)
         return duration >= this.filterMinDurationValue
       })
@@ -407,8 +403,7 @@ export class DynamicFeedRecService extends BaseTabService<AllowedItemType> {
       // by 关键字过滤
       .filter((x) => {
         if (!this.filterText) return true
-        const major = x.modules?.module_dynamic?.major
-        const title = major?.archive?.title || major?.ugc_season?.title || ''
+        const title = x?.modules?.module_dynamic?.major?.archive?.title || ''
         return filterByFilterText({
           filterText: this.filterText,
           title,

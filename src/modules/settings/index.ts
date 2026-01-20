@@ -113,6 +113,7 @@ export const initialSettings = {
    */
   dynamicFeed: {
     showLive: true, // 在动态中显示直播
+    videoOnly: false, // type:all | type:video
 
     followGroup: {
       enabled: true, // 下拉筛选支持 - 关注分组

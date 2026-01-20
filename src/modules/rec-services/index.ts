@@ -8,22 +8,18 @@ import { lookinto } from '$modules/filter/normalize'
 import { AppRecService } from './app'
 import { PcRecService } from './pc'
 import { getServiceFromRegistry, REC_TABS, type FetcherOptions } from './service-map'
+import type { Key } from 'react'
 import type { RecItemTypeOrSeparator } from '$define'
 
 const debug = baseDebug.extend('service')
 
-export const recItemUniqer = (item: RecItemTypeOrSeparator) =>
+export const recItemUniqer = (item: RecItemTypeOrSeparator): Key =>
   item.api === EApiType.Separator
     ? item.uniqId
     : lookinto<string | number>(item, {
         [EApiType.AppRecommend]: (item) => item.param,
         [EApiType.PcRecommend]: (item) => item.bvid,
-        [EApiType.DynamicFeed]: (item) => {
-          const major = item.modules.module_dynamic.major
-          if (major.archive) return major.archive.bvid
-          if (major.ugc_season) return major.ugc_season.bvid
-          return item.id_str
-        },
+        [EApiType.DynamicFeed]: (item) => item.id_str, // item.modules.module_dynamic.major.archive.bvid
         [EApiType.Watchlater]: (item) => item.bvid,
         [EApiType.Fav]: (item) => item.bvid,
         [EApiType.PopularGeneral]: (item) => item.bvid,

@@ -31,7 +31,7 @@ import {
 import { EApiType } from '$define/index.shared'
 import { PcRecGoto } from '$define/pc-recommend'
 import { AntdTooltip } from '$modules/antd/custom'
-import { DynamicFeedBadgeText } from '$modules/rec-services/dynamic-feed/store'
+import { normalizeDynamicFeedItem } from '$modules/rec-services/dynamic-feed/api/df-normalize'
 import { isFavFolderPrivate } from '$modules/rec-services/fav/fav-util'
 import { IconForCollection, IconForPrivateFolder, IconForPublicFolder } from '$modules/rec-services/fav/views'
 import { isPgcSeasonRankItem, isPgcWebRankItem } from '$modules/rec-services/hot/rank/rank-tab'
@@ -42,7 +42,7 @@ import { getSettingsSnapshot } from '$modules/settings'
 import { toHttps } from '$utility/url'
 import { formatDuration, formatTimeStamp, getVideoInvalidReason, parseCount, parseDuration } from '$utility/video'
 import type { ReactNode } from 'react'
-import type { Badge as DynamicFeedBadge } from '$define/pc-dynamic-feed'
+import type { Badge as DynamicFeedBadge } from '$modules/rec-services/dynamic-feed/api/types/dynamic-feed.api'
 import type { FavItemExtend } from '$modules/rec-services/fav/types'
 
 export const DESC_SEPARATOR = '·'
@@ -90,7 +90,8 @@ export interface IVideoCardData {
   rankingDesc?: string
   liveExtraDesc?: string
   liveAreaName?: string
-  dynBadge?: DynamicFeedBadge
+  topMarkIcon?: string
+  topMarkText?: string
 }
 
 type Getter<T> = Record<RecItemType['api'], (item: RecItemType) => T>
@@ -301,66 +302,7 @@ function apiPcAdapter(item: PcRecItemExtend): IVideoCardData {
 
 export type { DynamicFeedBadge }
 function apiDynamicAdapter(item: DynamicFeedItemExtend): IVideoCardData {
-  const major = item.modules.module_dynamic.major
-  const author = item.modules.module_author
-
-  // 合集更新类型: DYNAMIC_TYPE_UGC_SEASON
-  const isUgcSeason = item.type === 'DYNAMIC_TYPE_UGC_SEASON' && major.ugc_season
-  const v = isUgcSeason ? major.ugc_season! : major.archive!
-
-  // ugc_season 和 archive 都有 bvid 字段
-  const aid = typeof v.aid === 'number' ? v.aid.toString() : v.aid
-  const bvid = (v as any).bvid
-
-  // 合集类型的作者名需要从 pub_action 中提取
-  // 格式如 "xxx更新了合集"，提取 "xxx"
-  let authorName = author.name
-  // 合集名在 module_author.name 中
-  const ugcSeasonName = isUgcSeason ? author.name : undefined
-  if (isUgcSeason && author.pub_action) {
-    const match = author.pub_action.match(/^(.+?)更新了合集$/)
-    if (match) {
-      authorName = match[1]
-    }
-  }
-
-  // 合集类型显示"合集 · 合集名"
-  const ugcSeasonRecommendReason = isUgcSeason && ugcSeasonName ? `合集 · ${ugcSeasonName}` : undefined
-
-  return {
-    // video
-    avid: aid,
-    bvid,
-    // cid: v.
-    goto: 'av',
-    href: `/video/${v.bvid}/`,
-    title: v.title,
-    cover: v.cover,
-    pubts: author.pub_ts,
-    duration: parseDuration(v.duration_text) || 0,
-    durationStr: v.duration_text,
-
-    // 普通视频显示 recommendReason, 合集类型显示"合集 · 合集名"
-    recommendReason: isUgcSeason
-      ? ugcSeasonRecommendReason
-      : v.badge.text === DynamicFeedBadgeText.Upload
-        ? v.badge.text
-        : undefined,
-    dynBadge: v.badge as DynamicFeedBadge,
-
-    // stat
-    statItems: defineStatItems([
-      { field: 'play', value: v.stat.play },
-      { field: 'danmaku', value: v.stat.danmaku },
-    ]),
-    play: parseCount(v.stat.play),
-    danmaku: parseCount(v.stat.danmaku),
-
-    // author
-    authorName,
-    authorFace: author.face,
-    authorMid: author.mid.toString(),
-  }
+  return normalizeDynamicFeedItem(item)! // make sure result not empty
 }
 
 function apiWatchlaterAdapter(item: WatchlaterItemExtend): IVideoCardData {
