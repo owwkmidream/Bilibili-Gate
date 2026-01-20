@@ -297,10 +297,10 @@ export function useLargePreviewRelated({
     <VideoCardActionButton
       key='video-card-action-button'
       css={actionButtonCss}
-      {...actionButtonProps}
-      visible={actionButtonVisible}
       active={willRenderLargePreview}
       inlinePosition={'right'}
+      {...actionButtonProps}
+      visible={actionButtonVisible}
       icon={$req.loading ? <IconForLoading className='size-16px' /> : <IconParkOutlineVideoTwo className='size-15px' />}
       tooltip={triggerAction.state === 'click' ? (visible ? '关闭浮动预览' : '浮动预览') : '浮动预览'}
       onMouseEnter={(e) => onMouseEnter('video-card-action-button')}

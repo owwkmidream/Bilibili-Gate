@@ -43,6 +43,7 @@ export enum BiliDomain {
   Main = `www.${TLD}`,
   Space = `space.${TLD}`,
   Search = `search.${TLD}`,
+  Dynamic = `t.${TLD}`,
 }
 
 const { hostname, pathname } = location
@@ -51,6 +52,7 @@ export const IN_BILIBILI = hostname === BiliDomain.Tld || hostname.endsWith(`.${
 export const IN_BILIBILI_MAIN = [BiliDomain.Tld, BiliDomain.Main].includes(hostname)
 export const IN_BILIBILI_SPACE_PAGE = hostname === BiliDomain.Space
 export const IN_BILIBILI_SEARCH_PAGE = hostname === BiliDomain.Search
+export const IN_BILIBILI_DYNAMIC_PAGE = hostname === BiliDomain.Dynamic
 // page predicate
 export const IN_BILIBILI_HOMEPAGE = IN_BILIBILI_MAIN && (pathname === '/' || pathname === '/index.html')
 

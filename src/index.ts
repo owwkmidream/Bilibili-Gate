@@ -18,7 +18,13 @@ import '$modules/settings' // load config first
 
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
-import { IN_BILIBILI_HOMEPAGE, IN_BILIBILI_SEARCH_PAGE, IN_BILIBILI_SPACE_PAGE } from '$common'
+import {
+  IN_BILIBILI_DYNAMIC_PAGE,
+  IN_BILIBILI_HOMEPAGE,
+  IN_BILIBILI_SEARCH_PAGE,
+  IN_BILIBILI_SPACE_PAGE,
+} from '$common'
+import { initDynamicPage } from '$main/dynamic-page'
 import { initHomepage } from '$main/homepage'
 import { initSearchPage } from '$main/search-page'
 import { initSpacePage } from '$main/space-page'
@@ -32,4 +38,5 @@ void (function main() {
   if (IN_BILIBILI_VIDEO_PLAY_PAGE) return initVideoPlayPage()
   if (IN_BILIBILI_SPACE_PAGE) return initSpacePage()
   if (IN_BILIBILI_SEARCH_PAGE) return initSearchPage()
+  if (IN_BILIBILI_DYNAMIC_PAGE) return initDynamicPage()
 })()

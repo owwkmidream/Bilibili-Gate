@@ -180,6 +180,7 @@ export default defineConfig(({ command, mode }) => ({
           'https://www.bilibili.com/bangumi/play/*',
           'https://space.bilibili.com/*',
           'https://search.bilibili.com/*',
+          'https://t.bilibili.com/*',
         ],
         'connect': ['app.bilibili.com'],
         'grant': [

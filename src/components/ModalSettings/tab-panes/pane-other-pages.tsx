@@ -36,6 +36,22 @@ export function TabPaneOtherPages() {
           tooltip={<>在搜索页的视频也添加「浮动预览」</>}
         />
       </SettingsGroup>
+
+      <SettingsGroup title='动态页'>
+        <CheckboxSettingItem
+          configPath='videoCard.videoPreview.addTo.dynamicPage'
+          label='浮动预览: 添加到「动态页」'
+          tooltip={<>在动态页的视频也添加「浮动预览」</>}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup title='用户空间页'>
+        <CheckboxSettingItem
+          configPath='videoCard.videoPreview.addTo.spacePage'
+          label='浮动预览: 添加到「用户空间页」'
+          tooltip={<>在用户空间页的视频也添加「浮动预览」</>}
+        />
+      </SettingsGroup>
     </div>
   )
 }

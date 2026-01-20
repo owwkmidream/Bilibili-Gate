@@ -78,6 +78,8 @@ export const initialSettings = {
       usePreferredCdn: true,
       addTo: {
         searchPage: true,
+        dynamicPage: true,
+        spacePage: true,
       },
     },
 

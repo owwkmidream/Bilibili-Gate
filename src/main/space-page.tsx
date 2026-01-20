@@ -1,23 +1,34 @@
+import { useHover } from 'ahooks'
 import clsx from 'clsx'
+import { limitFunction } from 'promise.map'
+import { useEffect, useMemo, useRef, type ComponentProps, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { useUnoMerge } from 'unocss-merge/react'
 import { proxy, useSnapshot } from 'valtio'
-import { APP_NAME, APP_NAMESPACE } from '$common'
+import { APP_CLS_CARD, APP_CLS_CARD_COVER, APP_NAME, APP_NAMESPACE } from '$common'
 import { AppRoot } from '$components/AppRoot'
+import { useLargePreviewRelated } from '$components/LargePreview/useLargePreview'
+import { defaultRecSharedEmitter } from '$components/Recommends/rec.shared'
+import { VideoCardActionsClassNames } from '$components/VideoCard/child-components/VideoCardActions'
 import { AntdTooltip } from '$modules/antd/custom'
 import { IconForDynamicFeed, IconForSpaceUpload } from '$modules/icon'
 import { DynamicFeedQueryKey } from '$modules/rec-services/dynamic-feed/store'
 import { FavQueryKey } from '$modules/rec-services/fav/store'
 import { IconForCollection } from '$modules/rec-services/fav/views'
 import { SpaceUploadQueryKey } from '$modules/rec-services/space-upload/store'
+import { settings } from '$modules/settings'
 import { reusePendingPromise } from '$utility/async'
 import { poll, tryAction } from '$utility/dom'
-import { setupForNoneHomepage } from './shared'
-import type { ComponentProps, ReactNode } from 'react'
+import { isInIframe, setupForNoneHomepage } from './shared'
 
 export function initSpacePage() {
+  if (isInIframe()) return
   setupForNoneHomepage()
   addDynEntry()
+  if (settings.videoCard.videoPreview.addTo.spacePage) {
+    addLargePreviewForSpacePage()
+  }
 }
 
 const rootElId = `${APP_NAMESPACE}-${crypto.randomUUID()}`
@@ -220,4 +231,122 @@ function parseMid(href = location.href) {
     .find(Boolean)
   if (!mid || !/^\d+$/.test(mid)) return
   return mid
+}
+
+/**
+ * 浮动预览功能
+ * 用户空间页面使用 .bili-video-card 结构，与搜索页相同
+ */
+
+const previewProcessed = new WeakSet<HTMLDivElement>()
+const previewProcessedAttr = `${APP_NAMESPACE}-space-large-preview-processed`
+
+function addLargePreviewForSpacePage() {
+  const run = limitFunction(() => {
+    // 用户空间页面使用 .bili-video-card 结构
+    const itemsSelector = '.bili-video-card'
+    const list = Array.from(document.querySelectorAll<HTMLDivElement>(itemsSelector))
+    for (const el of list) addLargePreviewToCard(el)
+  }, 1)
+
+  run()
+  const ob = new MutationObserver(() => run())
+  ob.observe(document.body, { childList: true, subtree: true })
+}
+
+function addLargePreviewToCard(el: HTMLDivElement) {
+  if (previewProcessed.has(el)) return
+  if (el.getAttribute(previewProcessedAttr)) return
+
+  // 用户空间页封面: .bili-video-card__cover
+  const coverEl = el.querySelector<HTMLDivElement>('.bili-video-card__cover')
+  if (!coverEl) return
+
+  // 为 LargePreview 组件添加必要的类名
+  // LargePreview 的 getCoverRect 会查找 APP_CLS_CARD 和 APP_CLS_CARD_COVER 类名来定位
+  el.classList.add(APP_CLS_CARD)
+  coverEl.classList.add(APP_CLS_CARD_COVER)
+
+  const container = document.createElement('div')
+  coverEl.appendChild(container)
+  previewProcessed.add(el)
+  el.setAttribute(previewProcessedAttr, 'true')
+
+  const root = createRoot(container)
+  root.render(
+    <AppRoot>
+      <SpaceLargePreviewSetup el={el} coverEl={coverEl} />
+    </AppRoot>,
+  )
+}
+
+function SpaceLargePreviewSetup({ el, coverEl }: { el: HTMLDivElement; coverEl: HTMLDivElement }) {
+  const { bvid = '', cover } = useMemo(() => parseSpaceCardInfo(el), [el])
+  const cardEl = el
+  const hovering = useHover(cardEl)
+  const videoCardAsTriggerRef = useRef<HTMLElement | null>(coverEl)
+
+  // 修复层级问题：
+  // 1. 浮动窗口被相邻卡片遮挡：hover 时提升当前卡片 z-index
+  // 2. 浮动预览被官方 UI 遮挡：按钮使用更高的 z-index
+  useEffect(() => {
+    if (hovering) {
+      cardEl.style.zIndex = '1000'
+    } else {
+      cardEl.style.removeProperty('z-index')
+    }
+  }, [hovering, cardEl])
+
+  const { largePreviewActionButtonEl, largePreviewEl } = useLargePreviewRelated({
+    shouldFetchPreviewData: !!bvid,
+    hasLargePreviewActionButton: true,
+    actionButtonVisible: hovering,
+    actionButtonProps: {
+      inlinePosition: 'left', // tooltip 向右展开，避免被左边界裁剪
+      useMotion: true,
+      motionProps: {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0, transition: { delay: 0 } },
+        transition: { duration: 0.15, ease: 'linear', delay: 0 },
+      },
+    },
+    // required
+    bvid,
+    cid: undefined,
+    uniqId: bvid,
+    recSharedEmitter: defaultRecSharedEmitter,
+    cardTarget: cardEl,
+    // optional
+    cover,
+    videoCardAsTriggerRef,
+  })
+
+  return (
+    <>
+      {/* 放在左上角，避免遮挡右上角的官方稍后再看按钮 */}
+      {/* 官方稍后再看按钮 z-index 为 200，我们使用 z-[300] 确保覆盖 */}
+      <div className={useUnoMerge(VideoCardActionsClassNames.top('left'), 'left-8px z-[300]')}>
+        {largePreviewActionButtonEl}
+      </div>
+      {/* portal 到 cover 而不是 cardEl */}
+      {createPortal(largePreviewEl, coverEl)}
+    </>
+  )
+}
+
+function parseSpaceCardInfo(el: HTMLDivElement) {
+  let bvid: string | undefined
+  {
+    // 用户空间页链接结构: .bili-video-card__cover > a.bili-cover-card
+    // 使用更通用的选择器查找视频链接
+    const link = el.querySelector<HTMLAnchorElement>('a[href*="/video/"]')?.href
+    if (link) {
+      bvid = /\/video\/(?<bvid>BV\w+)/i.exec(link)?.groups?.bvid
+    }
+  }
+
+  const cover = el.querySelector<HTMLImageElement>('.bili-video-card__cover img')?.src
+
+  return { bvid, cover }
 }
